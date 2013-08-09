@@ -15,5 +15,5 @@ Things possibly on the agenda:
   *this may also impact on the way we (effectively) remove energy from
    the waves if breaking occurs - ie we may need to do it explicitly.
 - include generation of waves by wind
-- numerical desciption of floe size distribution &/or evolution equation for it
+- numerical description of floe size distribution (ie have floe size bins)  &/or evolution equation for it
 - refreezing
