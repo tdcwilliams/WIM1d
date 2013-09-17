@@ -1,0 +1,11 @@
+*.asv
+*.m~
+*.out
+*.aux
+*.bbl
+*.dvi
+*.log
+*.ps
+*.swp
+*.gz
+*.DS_Store
