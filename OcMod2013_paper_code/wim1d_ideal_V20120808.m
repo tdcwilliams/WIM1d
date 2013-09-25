@@ -951,7 +951,9 @@ for n = 1:nt
 
 end%% end time loop;
 
-if isempty(Dmiz)
+if ~exist('Dmiz','var')
+   Dmiz  = NaN;
+elseif isempty(Dmiz)
    Dmiz  = NaN;
 end
 
