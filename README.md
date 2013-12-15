@@ -17,3 +17,5 @@ Things possibly on the agenda:
 - include generation of waves by wind
 - numerical description of floe size distribution (ie have floe size bins)  &/or evolution equation for it
 - refreezing
+
+modified_code_v1 is the same as OcMod2013_paper but with use of Young's modulus made consistent 
