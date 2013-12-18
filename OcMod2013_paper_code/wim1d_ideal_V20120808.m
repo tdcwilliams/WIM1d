@@ -836,7 +836,8 @@ for n = 1:nt
                   wlng_crest = g.*T_crit.^2./(2.*pi);
                else
                   wlng_crest =...
-                     GEN_get_ice_wavelength(hice(i),T_crit); 
+                     RPget_lam_dmpg(hice(i),2*pi/T_crit,pramsRP,0);
+                     %GEN_get_ice_wavelength(hice(i),T_crit); %#
                end
 
                Dc = wlng_crest/2;
