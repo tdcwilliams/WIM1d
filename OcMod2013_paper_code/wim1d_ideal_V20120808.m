@@ -837,7 +837,10 @@ for n = 1:nt
                else
                   wlng_crest =...
                      RPget_lam_dmpg(hice(i),2*pi/T_crit,pramsRP,0);
-                     %GEN_get_ice_wavelength(hice(i),T_crit); %#
+                     %old wavelength used incorrect
+                     %Young's modulus:
+                     %GEN_get_ice_wavelength(hice(i),T_crit);
+
                end
 
                Dc = wlng_crest/2;
