@@ -6,7 +6,8 @@ Code for 1d version of WIM
 1. OcMod2013-paper has the code for Williams et al (2013a,b).
    NB please don't modify this branch!!
 
-2. Please make new branches for new developments.
+2. Please make new branches for new developments/testing.
+   (These can be merged with the master branch if they work out.)
 
 Things possibly on the agenda:
 - make attenuation depend on Young's modulus as well
