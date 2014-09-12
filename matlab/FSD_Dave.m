@@ -1,80 +1,78 @@
-function Dave  = FSD_Dave(Dmin,Dmax,FSD_prams,FSD_CHG)
-%% CALL: Dave  = FSD_Dave(Dmin,Dmax,FSD_prams,FSD_CHG)
-%% OUTPUT:
-%% *Dave = average floe size;
-%% INPUTS:
-%% *Dmin = min floe size possible;
-%% *Dmax = max floe size possible (determined by wave field);
-%% *if FSD_CHG==0 -> Dumont et al (2011) model;
-%%   *FSD_PRAMS = {fragility xi};
-%% *if FSD_CHG==1 -> Split power law - like in Toyota et al (2010);
-%%   *FSD_prams = {gam1 gam2 Dchg};
-%%     *gam1 is exponent for small floes;
-%%     *gam2 is exponent for small floes;
-%%     *Dchg is D where regime shift (change in exponent) occurs;
+function [Dave,Dm,Pm] = FSD_Dave(Dmax,Dmin,lam,f0,model)
 
-D_top = 200;
-if Dmax>D_top
-   Dave  = Dmax;
-   return;
+if ~exist('model')
+   %%0: original fragility model
+   %%1: modified to have linear drop from f=f_big to 0
+   %%    for D\in [D_min,D']
+   %%2: modified to give f=(1-cos(D/D'))^2.5*f_big
+   model = 0;
+end
+
+if ~exist('Dmax')
+   Dmax  = 200;%m
+end
+if ~exist('Dmin')
+   Dmin  = 30;%m
+end
+if ~exist('lam')
+   lam   = 300;%m
+end
+if ~exist('f0')
+   f0 = .9;
 end
 %%
-if Dmax<Dmin
-   Dave  = Dmax;
-   %Dave  = Dmin;
+xi = 2;
+if 1
+   M  = log(Dmax/Dmin)/log(xi);%=log_xi(Dmax/Dmin)
+   %[M,log2(Dmax/Dmin)]
+   M  = floor(M);
+else
+   M  = 40;
+end
+
+mm = (0:M)';
+Dm = Dmax*(1/xi).^mm;
+
+if model==0
+   Nm = (1-f0)*(xi^2*f0).^mm;
+   %%
+   Ntot  = sum(Nm);
+   Pm    = Nm/Ntot;
+   Dave  = sum(Pm.*Dm);
    return;
 end
 
-if FSD_CHG
-%  gam1        = 1.15;
-%  gam2        = 2.5;
-%  Dchg        = Dchg_coeff*hice(i)^.75;
-   gam1        = FSD_prams{1};
-   gam2        = FSD_prams{2};
-   Dchg        = FSD_prams{3};
-   if 0%%truncate the long floe PDF at Dmax;
-      P0          = [];%% make PDF continuous;
-      PDF_prams   = {Dmin,gam1+1,Dchg,gam2+1,Dmax};
-      Dave        = PDF_SplitPowerLaw_trunc_pdf([],PDF_prams); 
-   else%%
-      PDF_prams   = {Dmin,gam1+1,Dchg,gam2+1};
-      Pmax        = 0.95;
-      %Dmax(n-1,i)
-      PDF_prams   = PDF_SplitPowerLaw_getP0(Dmax,Pmax,PDF_prams);
-      Dave        = PDF_SplitPowerLaw_pdf([],PDF_prams);
-   end
-else%% Dumont et al (2011) model;
-%  fragility   = 0.9;
-%  xi          = 2;
-   fragility   = FSD_prams{1};
-   xi          = FSD_prams{2};
-   Dave        = subfn_floe_scaling(fragility,xi,Dmin,Dmax);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+fm    = frag(Dm,f0,Dmin,lam,model);
+Nm    = 1+0*Dm;
+Nm(1) = 1;
+
+for m=0:M-1
+   Nm(m+2)  = xi^2*fm(m+1)*Nm(m+1);
+   Nm(m+1)  = (1-fm(m+1))*Nm(m+1);
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function Dave = subfn_floe_scaling(f,xi,Dmin,Dmax)
-% This function computes the average floe size within a grid cell as a
-% function of the maximum floe size using a bounded fractal renormalization
-% group method.
+Ntot  = sum(Nm);
+Pm    = Nm/Ntot;
+Dave  = sum(Pm.*Dm);
 
-% We suggest to use Dmin >= 20. Below that value, there is no scattering
-% by the floes for periods larger than 6 s (it's probably viscous however).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function f=frag(D,f0,Dmin,lam,model)
 
-%%% LGB CHANGE / Oct 2013
+%%large floes break with prob f0;
+f  = f0+0*D;
 
-if 1
- gam  = 2 + log(f)/log(xi);
- Dave = gam*(Dmax*((Dmin/Dmax)^gam)-Dmin)/(1-gam);
-else
- M  = floor(log2(Dmax/Dmin));
- if isfinite(M) && M > 0
-    m = 0:M;
-    N = (1 - f).*(xi.^2.*f).^m;
-    ND = N.*Dmax./(xi.^m);
-    Dave = sum(ND)./sum(N);
- else
-    Dave = Dmin;
- end
+%%small floes can't break;
+jj    = find(D<Dmin);
+f(jj) = 0;
+
+%%medium floes have length-dependent frag;
+jj    = find((D>=Dmin) & (D<=lam));
+
+switch model
+case 1
+   f(jj) = (D(jj)-Dmin)/(lam-Dmin)*f0;
+case 2
+   cc    = cos(pi/2*D(jj)/lam);
+   f(jj) = (1-cc).^2.5*f0;
 end
-
-Dave = max(Dave,Dmin);
