@@ -9,6 +9,8 @@ Code for 1d version of WIM
 2. Please make new branches for new developments/testing.
    (These can be merged with the master branch if they work out.)
 
+3. test-youngs to allow attenuation to depend on Youn's modulus
+
 Things possibly on the agenda:
 - make attenuation depend on Young's modulus as well
 - set a definite time scale for the breaking to happen at
