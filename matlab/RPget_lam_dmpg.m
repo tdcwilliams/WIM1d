@@ -45,8 +45,7 @@ damping  = 0*om_vec;
 for w=1:nw
    om    = om_vec(w);
    k_ice = GEN_findroot_NR(@disp_fn_rp,gs1,h,om,prams,0);
-   %k_rp  = GEN_findroot_NR(@disp_fn_rp,gs1,h,om,prams,visc_rp);
-   k_rp  = GEN_findroot_NR(@disp_fn_rp,k_ice,h,om,prams,visc_rp);
+   k_rp  = GEN_findroot_NR(@disp_fn_rp,gs1,h,om,prams,visc_rp);
    %%
    gs1   = k_ice;
    gs2   = k_rp;
@@ -101,28 +100,3 @@ C1    = 1-alp*d-1i*gam;
 
 f  = C5*k.^5+C1*k-alp;
 df = 5*C5*k.^4+C1;
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [f,df] = disp_fn_rp_H(k,h,om,prams,visc_rp,H)
-%% CALL: [f,df] = disp_fn_rp(prams,h,om,visc_rp)
-%% dispersion relation (INFINITE DEPTH) is:
-%% f=(D/rho/g)*k^5+(1-alp*d-1i*om*visc_rp/rho/g)*k-alp=0,
-%% where D is flexural rigidity, alp=om^2/g, and visc_rp
-%% is the Robinson & Palmer eddy viscosity parameter;
-%%
-%% prams = [Y,nu,rho_wtr,rho_ice,g];
-Y     = prams(1);%%Young's modulus [Pa]
-nu    = prams(2);%%Poisson's ratio
-rho   = prams(3);%%density of water [kg/m^3]
-rho_i = prams(4);%%density of ice [kg/m^3]
-g     = prams(5);%%gravity[m/s^2]
-d     = rho_i/rho*h;%%draft [m]
-
-alp   = om^2/g;
-D     = Y*h^3/12/(1-nu^2);
-C5    = D/rho/g;
-gam   = om*visc_rp/rho/g;
-C1    = 1-alp*d-1i*gam;
-
-f  = (C5*k.^5+C1*k).*tanh(k*H)-alp;
-df = (5*C5*k.^4+C1).*tanh(k*H)+H*(C5*k.^5+C1*k).*sech(k*H).^2;
