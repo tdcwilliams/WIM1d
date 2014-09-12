@@ -3,9 +3,10 @@ WIM1d
 
 Code for 1d version of WIM
 
-OcMod2013_paper_code has the code for Williams et al (2013a,b).
+1. OcMod2013-paper has the code for Williams et al (2013a,b).
+   NB please don't modify this branch!!
 
-Please make new directories for new developments.
+2. Please make new branches for new developments.
 
 Things possibly on the agenda:
 - make attenuation depend on Young's modulus as well
@@ -17,5 +18,3 @@ Things possibly on the agenda:
 - include generation of waves by wind
 - numerical description of floe size distribution (ie have floe size bins)  &/or evolution equation for it
 - refreezing
-
-modified_code_v1 is the same as OcMod2013_paper but with use of Young's modulus made consistent 
